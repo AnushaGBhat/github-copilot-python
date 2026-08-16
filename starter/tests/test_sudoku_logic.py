@@ -88,6 +88,38 @@ def test_generate_puzzle_has_requested_clues_and_solution_full():
                 assert puzzle[r][c] == solution[r][c]
 
 
+def test_count_solutions_unique_puzzle():
+    puzzle = [
+        [5,3,0,0,7,0,0,0,0],
+        [6,0,0,1,9,5,0,0,0],
+        [0,9,8,0,0,0,0,6,0],
+        [8,0,0,0,6,0,0,0,3],
+        [4,0,0,8,0,3,0,0,1],
+        [7,0,0,0,2,0,0,0,6],
+        [0,6,0,0,0,0,2,8,0],
+        [0,0,0,4,1,9,0,0,5],
+        [0,0,0,0,8,0,0,7,9],
+    ]
+    assert sudoku_logic.count_solutions(puzzle) == 1
+
+
+def test_count_solutions_multiple_solutions():
+    empty_board = sudoku_logic.create_empty_board()
+    assert sudoku_logic.count_solutions(empty_board, limit=2) == 2
+
+
+def test_generate_puzzle_has_unique_solution():
+    for _ in range(10):
+        puzzle, solution = sudoku_logic.generate_puzzle(clues=35)
+        assert sum(1 for row in puzzle for cell in row if cell != sudoku_logic.EMPTY) == 35
+        assert sudoku_logic.count_solutions(puzzle) == 1
+        assert all(cell != sudoku_logic.EMPTY for row in solution for cell in row)
+        for r in range(sudoku_logic.SIZE):
+            for c in range(sudoku_logic.SIZE):
+                if puzzle[r][c] != sudoku_logic.EMPTY:
+                    assert puzzle[r][c] == solution[r][c]
+
+
 def test_fill_board_solves_known_puzzle():
     puzzle = [
         [5,3,0,0,7,0,0,0,0],
