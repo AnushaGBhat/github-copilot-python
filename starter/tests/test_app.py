@@ -1,0 +1,15 @@
+import sys
+import os
+
+# Ensure the starter package directory is importable (tests located in starter/tests)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from app import app as flask_app
+
+
+def test_index_route_renders_page():
+    client = flask_app.test_client()
+    res = client.get('/')
+    assert res.status_code == 200
+    text = res.get_data(as_text=True)
+    assert 'Sudoku Game' in text
