@@ -13,3 +13,16 @@ def test_index_route_renders_page():
     assert res.status_code == 200
     text = res.get_data(as_text=True)
     assert 'Sudoku Game' in text
+    assert 'difficulty' in text.lower()
+
+
+def test_new_game_route_supports_difficulty_selection():
+    client = flask_app.test_client()
+    res = client.get('/new?difficulty=easy')
+    assert res.status_code == 200
+    payload = res.get_json()
+    assert payload['difficulty'] == 'easy'
+    assert payload['solution']
+    assert len(payload['puzzle']) == 9
+    assert len(payload['solution']) == 9
+    assert sum(1 for row in payload['puzzle'] for cell in row if cell != 0) == 45

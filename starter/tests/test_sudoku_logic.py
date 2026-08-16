@@ -88,6 +88,63 @@ def test_generate_puzzle_has_requested_clues_and_solution_full():
                 assert puzzle[r][c] == solution[r][c]
 
 
+def test_all_difficulties_generate_unique_puzzles_with_distinct_clue_counts():
+    clue_counts = {}
+    for difficulty in ['easy', 'medium', 'hard']:
+        puzzle, solution = sudoku_logic.generate_puzzle_for_difficulty(difficulty)
+        non_empty = sum(1 for row in puzzle for cell in row if cell != sudoku_logic.EMPTY)
+        clue_counts[difficulty] = non_empty
+        assert non_empty == sudoku_logic.DIFFICULTY_SETTINGS[difficulty]['clues']
+        assert sudoku_logic.count_solutions(puzzle) == 1
+        assert all(cell != sudoku_logic.EMPTY for row in solution for cell in row)
+
+    assert clue_counts['easy'] > clue_counts['medium'] > clue_counts['hard']
+
+
+def test_generate_puzzle_for_invalid_difficulty_raises_error():
+    try:
+        sudoku_logic.generate_puzzle_for_difficulty('impossible')
+        assert False, 'Expected ValueError for invalid difficulty'
+    except ValueError:
+        pass
+
+
+def test_find_incorrect_cells_detects_invalid_entries():
+    solution = [
+        [5, 3, 4, 6, 7, 8, 9, 1, 2],
+        [6, 7, 2, 1, 9, 5, 3, 4, 8],
+        [1, 9, 8, 3, 4, 2, 5, 6, 7],
+        [8, 5, 9, 7, 6, 1, 4, 2, 3],
+        [4, 2, 6, 8, 5, 3, 7, 9, 1],
+        [7, 1, 3, 9, 2, 4, 8, 5, 6],
+        [9, 6, 1, 5, 3, 7, 2, 8, 4],
+        [2, 8, 7, 4, 1, 9, 6, 3, 5],
+        [3, 4, 5, 2, 8, 6, 1, 7, 9],
+    ]
+    board = sudoku_logic.deep_copy(solution)
+    board[0][0] = 9
+    assert sudoku_logic.find_incorrect_cells(board, solution) == [[0, 0]]
+
+
+def test_is_board_solved_recognizes_completed_solution():
+    solution = [
+        [5, 3, 4, 6, 7, 8, 9, 1, 2],
+        [6, 7, 2, 1, 9, 5, 3, 4, 8],
+        [1, 9, 8, 3, 4, 2, 5, 6, 7],
+        [8, 5, 9, 7, 6, 1, 4, 2, 3],
+        [4, 2, 6, 8, 5, 3, 7, 9, 1],
+        [7, 1, 3, 9, 2, 4, 8, 5, 6],
+        [9, 6, 1, 5, 3, 7, 2, 8, 4],
+        [2, 8, 7, 4, 1, 9, 6, 3, 5],
+        [3, 4, 5, 2, 8, 6, 1, 7, 9],
+    ]
+    assert sudoku_logic.is_board_solved(solution, solution) is True
+
+    incomplete = sudoku_logic.deep_copy(solution)
+    incomplete[0][0] = sudoku_logic.EMPTY
+    assert sudoku_logic.is_board_solved(incomplete, solution) is False
+
+
 def test_count_solutions_unique_puzzle():
     puzzle = [
         [5,3,0,0,7,0,0,0,0],
