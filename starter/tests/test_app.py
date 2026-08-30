@@ -14,7 +14,20 @@ def test_index_route_renders_page():
     text = res.get_data(as_text=True)
     assert 'Sudoku Game' in text
     assert 'difficulty' in text.lower()
+    assert 'Hint' in text
+    assert 'Check' in text
+    assert 'Top 10 Fastest Times' in text
 
+
+
+
+def test_index_page_has_game_controls():
+    client = flask_app.test_client()
+    res = client.get('/')
+    assert res.status_code == 200
+    text = res.get_data(as_text=True)
+    for token in ['difficulty', 'new-game', 'hint-button', 'check-button', 'theme-toggle', 'scoreboard', 'timer']:
+        assert token in text
 
 def test_new_game_route_supports_difficulty_selection():
     client = flask_app.test_client()
